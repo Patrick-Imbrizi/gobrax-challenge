@@ -17,9 +17,11 @@ import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
 import { getVehicleById } from '../../services/vehicles';
 import DriverInfoCard from './components/DriverInfoCard';
-import { getDrivers } from '../../services/drivers';
+
 import EmptyState from '../EmptyState/EmptyState';
 import Loading from '../Loading/Loading';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectDriver } from '../../redux/selectedDriverSlice';
 
 
 
@@ -129,34 +131,16 @@ function EnhancedTableHead(props) {
 
 
 
-export default function EnhancedTable() {
+export default function DriversTable({ rows, loading }) {
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState([]);
-    const [selectedDriver, setSelectedDriver] = useState([])
     const [page, setPage] = useState(0);
     const [dense, setDense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [rows, setRows] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            const response = await getDrivers();
-            if (response.status === 200) {
-                const data = response.data;
-                setRows(data);
-            }
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-
-
+    const selectedDriver = useSelector(state => state.selectedDriver)
+    const dispatch = useDispatch();
 
     const handleRequestSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -166,22 +150,34 @@ export default function EnhancedTable() {
 
 
     const handleClick = async (event, row) => {
-        //mudar para dispatch Redux
-        const response = await getVehicleById(row.vehicleId);
-        if (response.status === 200 && row.vehicleId !== null) {
-            setSelectedDriver(response.data)
-        }
         if (row === selected) {
             setSelected([])
-            setSelectedDriver([])
-        } else {
-            setSelected(row);
+            dispatch(selectDriver({}))
         }
-        console.log(response, "RESPONSE")
+
+        else {
+            setSelected(row);
+            if (!row.vehicleId) {
+                const model = {
+                    name: row.name,
+                    vehicle: "Não vinculado"
+                }
+                dispatch(selectDriver(model))
+                return;
+            }
+            const response = await getVehicleById(row.vehicleId);
+            if (response.status === 200) {
+                const model = {
+                    name: row.name,
+                    vehicle: response.data?.vehicleBrand + ' - ' + response.data?.vehiclePlate
+                }
+                dispatch(selectDriver(model))
+            }
+        }
 
     };
 
-    const handleChangePage = (newPage) => {
+    const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
 
@@ -201,17 +197,13 @@ export default function EnhancedTable() {
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage,
             ),
-        [order, orderBy, page, rowsPerPage],
+        [rows, order, orderBy, page, rowsPerPage],
     );
-
-    useEffect(() => {
-        fetchData();
-    }, [])
 
 
     return (
         <Box sx={{ width: '100%' }}>
-            <DriverInfoCard driverName={selected.name} vehicle={selectedDriver} />
+            <DriverInfoCard driver={selectedDriver} />
             {loading && <Loading />}
             {!rows.length && !loading && <EmptyState />}
             {rows && !loading &&
@@ -294,5 +286,4 @@ export default function EnhancedTable() {
         </Box>
     );
 }
-
 
