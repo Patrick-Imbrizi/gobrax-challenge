@@ -1,0 +1,72 @@
+{
+  "drivers": [
+    {
+      "id": "1",
+      "name": "Patrick Imbrizi",
+      "documentNumber": "12312312320",
+      "vehicleId": null
+    },
+    {
+      "id": "2",
+      "name": "Patrick Dois",
+      "documentNumber": "12312312222",
+      "vehicleId": null
+    },
+    {
+      "id": "3a33",
+      "name": "Motorista Teste",
+      "documentNumber": "11524150690",
+      "vehicleId": "ad58"
+    },
+    {
+      "id": "c7ad",
+      "name": "patrick",
+      "documentNumber": "adasd",
+      "vehicleId": null
+    },
+    {
+      "id": "8069",
+      "name": "patrick",
+      "documentNumber": "adasdsddd",
+      "vehicleId": null
+    },
+    {
+      "id": "8f0e",
+      "name": "teste",
+      "documentNumber": "12345",
+      "vehicleId": "2"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "1",
+      "vehicleBrand": "Fiat",
+      "vehiclePlate": "DAF1440"
+    },
+    {
+      "id": "2",
+      "vehicleBrand": "Scania",
+      "vehiclePlate": "PAT1234"
+    },
+    {
+      "id": "6726",
+      "vehicleBrand": "asdas",
+      "vehiclePlate": "asd"
+    },
+    {
+      "id": "1039",
+      "vehicleBrand": "asdas",
+      "vehiclePlate": "asda"
+    },
+    {
+      "id": "0f80",
+      "vehicleBrand": "Scania",
+      "vehiclePlate": "DAF1234"
+    },
+    {
+      "id": "ad58",
+      "vehicleBrand": "Scania",
+      "vehiclePlate": "DAF1234"
+    }
+  ]
+}

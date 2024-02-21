@@ -1,181 +1,298 @@
-import React, { useState } from 'react';
-import { DataGrid, useGridApiContext } from '@mui/x-data-grid';
-import { Box, Grid, Typography } from '@mui/material';
+import React, { useEffect, useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import Paper from '@mui/material/Paper';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { visuallyHidden } from '@mui/utils';
+import { getVehicleById } from '../../services/vehicles';
+import DriverInfoCard from './components/DriverInfoCard';
+import { getDrivers } from '../../services/drivers';
+import EmptyState from '../EmptyState/EmptyState';
+import Loading from '../Loading/Loading';
 
 
-const columns = [
-    { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'name', headerName: 'Nome', flex: 1 },
-    { field: 'documentNumber', headerName: 'Documento', flex: 1, sortable: false },
-    { field: 'linked', headerName: 'Vínculo', flex: 1 }
-]
 
-const rows = [
-    {
-        "id": 1,
-        "name": "Imbrizi",
-        "documentNumber": "123.345.123-10",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 2,
-        "name": "Patrick",
-        "documentNumber": "321.323.123-22",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 3,
-        "name": "Nome 3",
-        "documentNumber": "456789012-34",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 4,
-        "name": "Nome 4",
-        "documentNumber": "123456789-56",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 5,
-        "name": "Nome 5",
-        "documentNumber": "987654321-78",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 6,
-        "name": "Nome 6",
-        "documentNumber": "135792468-90",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 7,
-        "name": "Nome 7",
-        "documentNumber": "246810357-92",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 8,
-        "name": "Nome 8",
-        "documentNumber": "357924681-04",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 9,
-        "name": "Nome 9",
-        "documentNumber": "468103579-26",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 10,
-        "name": "Nome 10",
-        "documentNumber": "579246810-38",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 11,
-        "name": "Nome 11",
-        "documentNumber": "681035792-50",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 12,
-        "name": "Nome 12",
-        "documentNumber": "792468103-72",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 13,
-        "name": "Nome 13",
-        "documentNumber": "803579246-84",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 14,
-        "name": "Nome 14",
-        "documentNumber": "914681035-96",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 15,
-        "name": "Nome 15",
-        "documentNumber": "203579246-08",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 16,
-        "name": "Nome 16",
-        "documentNumber": "314681035-20",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 17,
-        "name": "Nome 17",
-        "documentNumber": "425792468-32",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 18,
-        "name": "Nome 18",
-        "documentNumber": "536810357-44",
-        "linked": false,
-        "vehicle": "PAD-9339"
-    },
-    {
-        "id": 19,
-        "name": "Nome 19",
-        "documentNumber": "647924681-56",
-        "linked": true,
-        "vehicle": "PAD-9339"
-    },
-]
-
-export default function DriversTable() {
-    const [selectionModel, setSelectionModel] = useState([]);
-    const handleSelectionChange = (newSelection) => {
-        setSelectionModel(newSelection.slice(-1));
+function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
     }
-    const selectedRow = rows.filter((row) => row.id == selectionModel[0])
-    console.log(selectedRow, "SELECTED")
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function getComparator(order, orderBy) {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+
+function stableSort(array, comparator) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+        const order = comparator(a[0], b[0]);
+        if (order !== 0) {
+            return order;
+        }
+        return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+}
+
+const headCells = [
+    {
+        id: 'blank',
+        numeric: false,
+        disablePadding: false,
+        label: ' ',
+        isSorteable: false,
+    },
+    {
+        id: 'id',
+        numeric: false,
+        disablePadding: true,
+        label: 'ID',
+        isSorteable: false,
+    },
+    {
+        id: 'name',
+        numeric: false,
+        disablePadding: false,
+        label: 'Nome',
+        isSorteable: true,
+    },
+    {
+        id: 'documentNumber',
+        numeric: false,
+        disablePadding: false,
+        label: 'Documento',
+        isSorteable: false,
+    },
+    {
+        id: 'vehicleId',
+        numeric: false,
+        disablePadding: false,
+        label: 'Vínculo',
+        isSorteable: false,
+    },
+];
+
+function EnhancedTableHead(props) {
+    const { order, orderBy, onRequestSort } =
+        props;
+    const createSortHandler = (property) => (event) => {
+        onRequestSort(event, property);
+    };
 
     return (
-        <Box sx={{ color: 'black', width: '100%' }}>
-            <Grid container justifyContent='flex-end'>
-                <Grid item textAlign='left'>
-                    <Typography>
-                        Selecionado:
-                    </Typography>
-                    <Typography fontWeight={700}>
-                        Motorista: <span style={{ fontWeight: 400 }}>{selectedRow[0]?.name || "-"}</span>
-                    </Typography>
-                    <Typography fontWeight={700}>
-                        Veículo: <span style={{ fontWeight: 400 }}>{selectedRow[0]?.vehicle || "-"}</span>
-                    </Typography>
-                </Grid>
-            </Grid>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                checkboxSelection
-                rowSelectionModel={selectionModel}
-                onRowSelectionModelChange={handleSelectionChange}
-            />
-        </Box>
-    )
+        <TableHead>
+            <TableRow>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.id}
+                        align={'left'}
+                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            disabled={!headCell.isSorteable}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={createSortHandler(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id && headCell.isSorteable ? (
+                                <Box component="span" sx={visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </Box>
+                            ) : null}
+                        </TableSortLabel>
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
 }
+
+
+
+export default function EnhancedTable() {
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('calories');
+    const [selected, setSelected] = useState([]);
+    const [selectedDriver, setSelectedDriver] = useState([])
+    const [page, setPage] = useState(0);
+    const [dense, setDense] = useState(false);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const response = await getDrivers();
+            if (response.status === 200) {
+                const data = response.data;
+                setRows(data);
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+
+
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+
+    const handleClick = async (event, row) => {
+        //mudar para dispatch Redux
+        const response = await getVehicleById(row.vehicleId);
+        if (response.status === 200 && row.vehicleId !== null) {
+            setSelectedDriver(response.data)
+        }
+        if (row === selected) {
+            setSelected([])
+            setSelectedDriver([])
+        } else {
+            setSelected(row);
+        }
+        console.log(response, "RESPONSE")
+
+    };
+
+    const handleChangePage = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const isSelected = (id) => selected.id === id;
+
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+    const visibleRows = useMemo(
+        () =>
+            stableSort(rows, getComparator(order, orderBy)).slice(
+                page * rowsPerPage,
+                page * rowsPerPage + rowsPerPage,
+            ),
+        [order, orderBy, page, rowsPerPage],
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, [])
+
+
+    return (
+        <Box sx={{ width: '100%' }}>
+            <DriverInfoCard driverName={selected.name} vehicle={selectedDriver} />
+            {loading && <Loading />}
+            {!rows.length && !loading && <EmptyState />}
+            {rows && !loading &&
+                <Paper sx={{ width: '100%', mb: 2 }}>
+                    <TableContainer>
+                        <Table
+                            sx={{ minWidth: 750 }}
+                            aria-labelledby="tableTitle"
+                            size={dense ? 'small' : 'medium'}
+                        >
+                            <EnhancedTableHead
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onRequestSort={handleRequestSort}
+                                rowCount={rows.length}
+                            />
+                            <TableBody>
+                                {visibleRows.map((row, index) => {
+                                    const isItemSelected = isSelected(row.id);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
+
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleClick(event, row)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.id}
+                                            selected={isItemSelected}
+                                            sx={{ cursor: 'pointer' }}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId,
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell
+                                                component="th"
+                                                id={labelId}
+                                                scope="row"
+                                                padding="none"
+                                            >
+                                                {row.id}
+                                            </TableCell>
+                                            <TableCell align="left">{row.name}</TableCell>
+                                            <TableCell align="left">{row.documentNumber}</TableCell>
+                                            <TableCell align="left">{row.vehicleId ? 'Sim' : 'Não'}</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                                {emptyRows > 0 && (
+                                    <TableRow
+                                        style={{
+                                            height: (dense ? 33 : 53) * emptyRows,
+                                        }}
+                                    >
+                                        <TableCell colSpan={6} />
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </Paper>
+            }
+        </Box>
+    );
+}
+
+
