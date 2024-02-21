@@ -19,7 +19,6 @@
     "@reduxjs/toolkit": "^2.2.1",
     "axios": "^1.6.7",
     "forage": "^0.3.10",
-    "json-server": "^1.0.0-alpha.23",
     "local": "^0.3.3",
     "match-sorter": "^6.3.4",
     "prop-types": "^15.8.1",
@@ -38,6 +37,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "vite": "^5.1.0"
+    "vite": "^5.1.0",
+    "json-server": "^1.0.0-alpha.23"
   }
 }
