@@ -6,6 +6,8 @@ import { getDrivers } from "../../services/drivers";
 import { cpfMask } from "../../helper/cpfMask";
 import { onlyNumberMask } from "../../helper/onlyNumberMask";
 import { plateMask } from "../../helper/plateMask";
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Driver() {
     const [driver, setDriver] = useState('');
@@ -19,16 +21,23 @@ export default function Driver() {
 
 
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         const model = {
             name: driver,
             documentNumber: onlyNumberMask(cpf),
             vehicleId: selectedVehicle
         }
         try {
-            await addDriver(model);
+            const response = await addDriver(model);
+            if (response.status === 200) {
+                toast.success("Motorista criado com sucesso!")
+            }
         } catch (error) {
             console.log(error);
+        } finally {
+            toast.success("Motorista criado com sucesso!")
+            window.location.reload()
         }
     };
 
@@ -80,6 +89,9 @@ export default function Driver() {
             await editDriver(model);
         } catch (error) {
             console.log(error);
+            toast.error("Erro ao editar motorista")
+        } finally {
+            toast.success("Motorista editado com sucesso!")
         }
     }
 
@@ -88,7 +100,9 @@ export default function Driver() {
             await deleteDriver(selectedDriver.id);
         } catch (error) {
             console.log(error);
+            toast.error("Erro ao apagar motorista")
         } finally {
+            toast.success("Motorista apagado com sucesso!")
             window.location.reload();
         }
     }
@@ -101,6 +115,7 @@ export default function Driver() {
 
     return (
         <>
+            <ToastContainer />
             <Container style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
                 <Typography align='left' variant='h5' fontWeight={700} marginBottom={2}>
                     Cadastro de motorista
@@ -186,6 +201,8 @@ export default function Driver() {
                         sx={{ minWidth: 200, marginBottom: 4 }}
                         onChange={onDriverListChange}
                         noOptionsText={'Sem opções'}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        getOptionKey={(option) => option.id}
                         getOptionLabel={(option) => option.name + ' - ' + cpfMask(option.documentNumber)}
                         renderInput={(params) => <TextField {...params} label="Pesquise pelo motorista" />}
                     />

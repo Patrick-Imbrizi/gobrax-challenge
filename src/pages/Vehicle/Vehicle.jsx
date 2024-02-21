@@ -2,6 +2,8 @@ import { Paper, Typography, TextField, Button, Container, Autocomplete, Grid } f
 import React, { useEffect, useState } from "react";
 import { addVehicle, deleteVehicle, editVehicle, getVehicles } from "../../services/vehicles";
 import { plateMask } from "../../helper/plateMask";
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Vehicle() {
 
@@ -17,10 +19,13 @@ export default function Vehicle() {
             vehiclePlate: plate.replace(/\W/g, "").substring(0, 7)
         }
         try {
-            const response = await addVehicle(model);
-            console.log(response.data)
+            await addVehicle(model);
         } catch (error) {
             console.log(error);
+            toast.error("Erro ao criar veículo")
+        } finally {
+            toast.success("Veículo criado com sucesso!")
+            window.location.reload();
         }
     };
 
@@ -40,16 +45,19 @@ export default function Vehicle() {
             await editVehicle(model);
         } catch (error) {
             console.log(error);
+            toast.error("Erro ao editar veículo")
+        } finally {
+            toast.success("Veículo editado com sucesso!")
         }
     }
 
     const handleDelete = async () => {
         try {
-            const response = await deleteVehicle(selectedVehicle.id);
-            console.log(response.data);
+            await deleteVehicle(selectedVehicle.id);
         } catch (error) {
             console.log(error);
         } finally {
+            toast.success("Veículo apagado com sucesso!")
             window.location.reload();
         }
     }
@@ -61,6 +69,7 @@ export default function Vehicle() {
 
     return (
         <>
+            <ToastContainer />
             <Container style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
                 <Typography align='left' variant='h5' fontWeight={700} marginBottom={2}>
                     Cadastro de veículo
@@ -119,6 +128,7 @@ export default function Vehicle() {
                         options={vehiclesList}
                         getOptionKey={(option) => option.id}
                         sx={{ minWidth: 200, marginBottom: 4 }}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
                         onChange={onVehicleListChange}
                         getOptionLabel={(option) => option.vehicleBrand + ' - ' + plateMask(option.vehiclePlate)}
                         renderInput={(params) => <TextField {...params} label="Pesquise pelo veículo" />}
