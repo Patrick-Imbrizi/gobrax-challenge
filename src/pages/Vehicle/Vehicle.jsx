@@ -1,63 +1,179 @@
-import { Box, Paper, Typography, TextField, Button, Container } from "@mui/material";
-import React, { useState } from "react";
-import { addVehicle } from "../../services/vehicles";
+import { Paper, Typography, TextField, Button, Container, Autocomplete, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { addVehicle, deleteVehicle, editVehicle, getVehicles } from "../../services/vehicles";
 
 export default function Vehicle() {
-    const [marca, setMarca] = useState('');
-    const [placa, setPlaca] = useState('');
 
+    const [vehiclesList, setVehiclesList] = useState([]);
+    const [selectedVehicle, setSelectedVehicle] = useState('');
+    const [brand, setBrand] = useState('');
+    const [plate, setPlate] = useState('');
 
-    // add validations here ()
-    const handleSubmit = async () => {
+    // add validations here (formato placa etc)
+    // form create
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         const model = {
-            vehicleBrand: marca,
-            vehiclePlate: placa
+            vehicleBrand: brand,
+            vehiclePlate: plate
         }
         try {
             const response = await addVehicle(model);
-            return response;
+            console.log(response.data)
         } catch (error) {
             console.log(error);
         }
     };
 
+    //form edit
+    const onVehicleListChange = async (event, newValue) => {
+        setSelectedVehicle(newValue);
+    }
+
+
+
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        const model = {
+            id: selectedVehicle.id,
+            vehicleBrand: selectedVehicle.vehicleBrand,
+            vehiclePlate: selectedVehicle.vehiclePlate
+        }
+        try {
+            const response = await editVehicle(model);
+            console.log(response.data, "data")
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleDelete = async () => {
+        try {
+            const response = await deleteVehicle(selectedVehicle.id);
+            console.log(response.data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            window.location.reload();
+        }
+    }
+
+
+    useEffect(() => {
+        getVehicles().then((data) => setVehiclesList(data.data));
+    }, [])
+
     return (
-        <Container style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
-            <form onSubmit={handleSubmit}>
-                <Paper
-                    style={{
-                        padding: 24,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 12,
-                    }}
-                >
-                    <Typography variant="h6" fontWeight={700}>
-                        Cadastro de Veículos
-                    </Typography>
-                    <TextField
-                        required
-                        size="small"
-                        id="marca"
-                        label="Marca"
-                        variant="outlined"
-                        value={marca}
-                        onChange={(e) => setMarca(e.target.value)}
-                    />
-                    <TextField
-                        required
-                        size="small"
-                        id="placa"
-                        label="Placa"
-                        variant="outlined"
-                        value={placa}
-                        onChange={(e) => setPlaca(e.target.value)}
-                    />
-                    <Button style={{ maxWidth: '390px' }} variant="contained" color="primary" type="submit">
-                        Criar
-                    </Button>
+        <>
+            <Container style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
+                <Typography align='left' variant='h5' fontWeight={700} marginBottom={2}>
+                    Cadastro de veículo
+                </Typography>
+                <Paper style={{ padding: 24, borderRadius: 12 }}>
+                    <form onSubmit={handleSubmit}>
+                        <Grid container display='flex' flexWrap='wrap' gap={2}>
+                            <Grid item xs={12} md={4} style={{ flex: 1 }}>
+                                <Typography marginBottom={1} align='left' fontWeight={600}>
+                                    Marca do veículo:
+                                </Typography>
+                                <TextField
+                                    required
+                                    style={{ minWidth: 200, width: '100%' }}
+                                    size="small"
+                                    id="vehicleBrand"
+                                    label="Digite a marca"
+                                    variant="outlined"
+                                    value={brand}
+                                    onChange={(e) => setBrand(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={4} style={{ flex: 1 }}>
+                                <Typography marginBottom={1} align='left' fontWeight={600}>
+                                    Placa do veículo:
+                                </Typography>
+                                <TextField
+                                    required
+                                    style={{ minWidth: 200, width: '100%' }}
+                                    size="small"
+                                    id="vehiclePlate"
+                                    label="Digite a placa"
+                                    variant="outlined"
+                                    value={plate}
+                                    onChange={(e) => setPlate(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12} display='flex' justifyContent='flex-start'>
+                                <Button variant="contained" color="primary" type="submit">
+                                    Criar
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </form>
                 </Paper>
-            </form>
-        </Container>
+                <Typography align='left' variant='h5' fontWeight={700} marginBottom={2} marginTop={4}>
+                    Editar veículo
+                </Typography>
+                <Paper style={{ padding: 24, borderRadius: 12 }}>
+                    <Typography marginBottom={1} align='left' fontWeight={600}>
+                        Selecione um veículo:
+                    </Typography>
+                    <Autocomplete
+                        id="vehiclesList"
+                        size="small"
+                        options={vehiclesList}
+                        getOptionKey={(option) => option.id}
+                        sx={{ minWidth: 200, marginBottom: 4 }}
+                        onChange={onVehicleListChange}
+                        getOptionLabel={(option) => option.vehicleBrand + ' - ' + option.vehiclePlate}
+                        renderInput={(params) => <TextField {...params} label="Pesquise pelo veículo" />}
+                    />
+                    {selectedVehicle ?
+                        <form onSubmit={handleEdit}>
+                            <Grid container display='flex' flexWrap='wrap' gap={2}>
+                                <Grid item xs={12} md={4} style={{ flex: 1 }}>
+                                    <Typography marginBottom={1} align='left' fontWeight={600}>
+                                        Marca do veículo:
+                                    </Typography>
+                                    <TextField
+                                        required
+                                        style={{ minWidth: 200, width: '100%' }}
+                                        size="small"
+                                        id="vehicle"
+                                        label="Digite a marca"
+                                        variant="outlined"
+                                        value={selectedVehicle ? selectedVehicle.vehicleBrand : ''}
+                                        onChange={(e) => setSelectedVehicle({ ...selectedVehicle, vehicleBrand: e.target.value })}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={4} style={{ flex: 1 }}>
+                                    <Typography marginBottom={1} align='left' fontWeight={600}>
+                                        Placa do veículo:
+                                    </Typography>
+                                    <TextField
+                                        required
+                                        style={{ minWidth: 200, width: '100%' }}
+                                        size="small"
+                                        id="vehiclePlate"
+                                        label="Digite a placa"
+                                        variant="outlined"
+                                        value={selectedVehicle ? selectedVehicle.vehiclePlate : ''}
+                                        onChange={(e) => setSelectedVehiselectedVehicle({ ...selectedVehicle, vehiclePlate: e.target.value })}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} display='flex' justifyContent='flex-end' gap={2}>
+                                    <Button variant="contained" color="warning" onClick={handleDelete}>
+                                        Apagar
+                                    </Button>
+                                    <Button variant="contained" color="primary" type="submit">
+                                        Salvar
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </form>
+                        : <></>
+                    }
+                </Paper>
+            </Container>
+        </>
     );
 }

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { addDriver, deleteDriver, editDriver } from "../../services/drivers";
 import { getVehicleById, getVehicles } from "../../services/vehicles";
 import { getDrivers } from "../../services/drivers";
-import Header from "../../components/Header/Header"
 
 export default function Driver() {
     const [driver, setDriver] = useState('');
@@ -15,6 +14,23 @@ export default function Driver() {
     const [selectedDriverVehicle, setSelectedDriverVehicle] = useState([]);
 
 
+    // add validations here (cpf, unique vehicle id etc)
+    // form create
+    const handleSubmit = async () => {
+        const model = {
+            name: driver,
+            documentNumber: cpf,
+            vehicleId: selectedVehicle
+        }
+        try {
+            const response = await addDriver(model);
+            console.log(response.data)
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    // form edit
 
     const handleVehicleChange = (event) => {
         setSelectedVehicle(event.target.value);
@@ -38,20 +54,7 @@ export default function Driver() {
 
     }
 
-    // add validations here (cpf, unique vehicle id etc)
-    const handleSubmit = async () => {
-        const model = {
-            name: driver,
-            documentNumber: cpf,
-            vehicleId: selectedVehicle
-        }
-        try {
-            const response = await addDriver(model);
-            console.log(response.data)
-        } catch (error) {
-            console.log(error);
-        }
-    };
+
 
     const handleEdit = async () => {
         const model = {

@@ -4,42 +4,28 @@
       "id": "1",
       "name": "Patrick Imbrizi",
       "documentNumber": "12312312320",
-      "vehicleId": "1"
+      "vehicleId": null
     },
     {
       "id": "2",
       "name": "Patrick Dois",
       "documentNumber": "12312312222",
-      "vehicleId": "1"
+      "vehicleId": null
     },
     {
       "id": "3a33",
       "name": "Motorista Teste",
       "documentNumber": "11524150692",
       "vehicleId": "0f80"
+    },
+    {
+      "id": "eece",
+      "name": "MarcaTeste",
+      "documentNumber": "ASD1233",
+      "vehicleId": ""
     }
   ],
   "vehicles": [
-    {
-      "id": "1",
-      "vehicleBrand": "Fiat",
-      "vehiclePlate": "DAF1440"
-    },
-    {
-      "id": "2",
-      "vehicleBrand": "Scania",
-      "vehiclePlate": "PAT1234"
-    },
-    {
-      "id": "6726",
-      "vehicleBrand": "asdas",
-      "vehiclePlate": "asd"
-    },
-    {
-      "id": "1039",
-      "vehicleBrand": "asdas",
-      "vehiclePlate": "asda"
-    },
     {
       "id": "0f80",
       "vehicleBrand": "Scania",
@@ -49,6 +35,11 @@
       "id": "ad58",
       "vehicleBrand": "Scania",
       "vehiclePlate": "DAF1234"
+    },
+    {
+      "id": "5600",
+      "vehicleBrand": "dasda",
+      "vehiclePlate": "12312313"
     }
   ]
 }
