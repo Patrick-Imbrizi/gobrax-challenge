@@ -206,7 +206,7 @@ export default function DriversTable({ rows, loading }) {
             <DriverInfoCard driver={selectedDriver} />
             {loading && <Loading />}
             {!rows.length && !loading && <EmptyState />}
-            {rows && !loading &&
+            {rows.length > 0 && !loading &&
                 <Paper sx={{ width: '100%', mb: 2 }}>
                     <TableContainer>
                         <Table
