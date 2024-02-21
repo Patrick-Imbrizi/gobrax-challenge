@@ -33,4 +33,4 @@ Este projeto busca demonstrar minhas habilidades e conhecimento em desenvolvimen
 * Github: https://github.com/Patrick-Imbrizi
 
 
-**Desde já, muito obrigado pela oportunidade.**
+
