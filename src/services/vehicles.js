@@ -36,3 +36,12 @@ export const editVehicle = async (vehicle) => {
         return error
     }
 }
+
+export const deleteVehicle = async (id) => {
+    try {
+        const response = await api.delete(`/vehicles/${id}`)
+        return response;
+    } catch (error) {
+        return error;
+    }
+}

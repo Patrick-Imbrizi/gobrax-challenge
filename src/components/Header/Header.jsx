@@ -4,7 +4,7 @@ import Logo from '../../assets/gobrax.png';
 
 export default function Header() {
     return (
-        <Grid container justifyContent='space-between' alignItems='center' marginBottom={4}>
+        <Grid container justifyContent='space-between' alignItems='center' marginBottom={4} backgroundColor='white' width='100%'>
             <Grid item xs justifyContent={'flex-start'}>
                 <Button
                     href='/driver'

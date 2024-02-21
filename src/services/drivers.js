@@ -9,6 +9,14 @@ export const getDrivers = async () => {
         return error;
     }
 }
+export const getDriverById = async (id) => {
+    try {
+        const response = await api.get(`/drivers/${id}`)
+        return response;
+    } catch (error) {
+        return error;
+    }
+}
 
 export const addDriver = async (data) => {
     try {
@@ -25,5 +33,14 @@ export const editDriver = async (driver) => {
         return response;
     } catch (error) {
         return error
+    }
+}
+
+export const deleteDriver = async (id) => {
+    try {
+        const response = await api.delete(`/drivers/${id}`)
+        return response;
+    } catch (error) {
+        return error;
     }
 }
