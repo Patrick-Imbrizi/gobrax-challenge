@@ -17,12 +17,6 @@
       "name": "Motorista Teste",
       "documentNumber": "11524150692",
       "vehicleId": "0f80"
-    },
-    {
-      "id": "eece",
-      "name": "MarcaTeste",
-      "documentNumber": "ASD1233",
-      "vehicleId": ""
     }
   ],
   "vehicles": [

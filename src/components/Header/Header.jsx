@@ -5,7 +5,7 @@ import Logo from '../../assets/gobrax.png';
 export default function Header() {
     return (
         <Grid container justifyContent='space-between' alignItems='center' marginBottom={4} backgroundColor='white' width='100%'>
-            <Grid item xs justifyContent={'flex-start'}>
+            <Grid item xs justifyContent={'flex-start'} sx={{ display: { xs: 'none', md: 'block' } }}>
                 <Button
                     href='/driver'
                     variant='text'
@@ -21,10 +21,10 @@ export default function Header() {
                     Veículos
                 </Button>
             </Grid>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={8}>
                 <img src={Logo} height={50} />
             </Grid>
-            <Grid item xs>
+            <Grid item xs style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                     href='https://www.linkedin.com/in/pimbrizi/'
                     target='_blank'

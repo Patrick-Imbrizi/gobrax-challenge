@@ -3,7 +3,7 @@ import { Grid, Typography } from "@mui/material";
 
 export default function DriverInfoCard({ driver }) {
     return (
-        <Grid container justifyContent='flex-end'>
+        <Grid container sx={{ justifyContent: { xs: 'flex-start', md: 'flex-end' } }} marginBottom={2}>
             <Grid item textAlign='left' style={{ minWidth: 250 }}>
                 <Typography>
                     Selecionado:
