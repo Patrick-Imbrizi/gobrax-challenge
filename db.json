@@ -1,39 +1,23 @@
 {
   "drivers": [
     {
-      "id": "1",
-      "name": "Patrick Imbrizi",
-      "documentNumber": "12312312320",
-      "vehicleId": null
-    },
-    {
-      "id": "2",
-      "name": "Patrick Dois",
-      "documentNumber": "12312312222",
-      "vehicleId": null
-    },
-    {
-      "id": "3a33",
+      "id": "ad67",
       "name": "Motorista Teste",
-      "documentNumber": "11524150692",
-      "vehicleId": "0f80"
+      "documentNumber": "11524150690",
+      "vehicleId": null
+    },
+    {
+      "id": "4b76",
+      "name": "Motorista Teste",
+      "documentNumber": "23321232324",
+      "vehicleId": "91e3"
     }
   ],
   "vehicles": [
     {
-      "id": "0f80",
-      "vehicleBrand": "Scania",
-      "vehiclePlate": "DAF1234"
-    },
-    {
-      "id": "ad58",
-      "vehicleBrand": "Scania",
-      "vehiclePlate": "DAF1234"
-    },
-    {
-      "id": "5600",
-      "vehicleBrand": "dasda",
-      "vehiclePlate": "12312313"
+      "id": "91e3",
+      "vehicleBrand": "marca teste",
+      "vehiclePlate": "DAT1234"
     }
   ]
 }

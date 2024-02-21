@@ -1,6 +1,7 @@
 import { Paper, Typography, TextField, Button, Container, Autocomplete, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { addVehicle, deleteVehicle, editVehicle, getVehicles } from "../../services/vehicles";
+import { plateMask } from "../../helper/plateMask";
 
 export default function Vehicle() {
 
@@ -9,13 +10,11 @@ export default function Vehicle() {
     const [brand, setBrand] = useState('');
     const [plate, setPlate] = useState('');
 
-    // add validations here (formato placa etc)
-    // form create
     const handleSubmit = async (e) => {
         e.preventDefault();
         const model = {
             vehicleBrand: brand,
-            vehiclePlate: plate
+            vehiclePlate: plate.replace(/\W/g, "").substring(0, 7)
         }
         try {
             const response = await addVehicle(model);
@@ -25,7 +24,6 @@ export default function Vehicle() {
         }
     };
 
-    //form edit
     const onVehicleListChange = async (event, newValue) => {
         setSelectedVehicle(newValue);
     }
@@ -33,15 +31,13 @@ export default function Vehicle() {
 
 
     const handleEdit = async (e) => {
-        e.preventDefault();
         const model = {
             id: selectedVehicle.id,
             vehicleBrand: selectedVehicle.vehicleBrand,
-            vehiclePlate: selectedVehicle.vehiclePlate
+            vehiclePlate: selectedVehicle.vehiclePlate.replace(/\W/g, "").substring(0, 7)
         }
         try {
-            const response = await editVehicle(model);
-            console.log(response.data, "data")
+            await editVehicle(model);
         } catch (error) {
             console.log(error);
         }
@@ -98,7 +94,7 @@ export default function Vehicle() {
                                     id="vehiclePlate"
                                     label="Digite a placa"
                                     variant="outlined"
-                                    value={plate}
+                                    value={plateMask(plate)}
                                     onChange={(e) => setPlate(e.target.value)}
                                 />
                             </Grid>
@@ -124,7 +120,7 @@ export default function Vehicle() {
                         getOptionKey={(option) => option.id}
                         sx={{ minWidth: 200, marginBottom: 4 }}
                         onChange={onVehicleListChange}
-                        getOptionLabel={(option) => option.vehicleBrand + ' - ' + option.vehiclePlate}
+                        getOptionLabel={(option) => option.vehicleBrand + ' - ' + plateMask(option.vehiclePlate)}
                         renderInput={(params) => <TextField {...params} label="Pesquise pelo veículo" />}
                     />
                     {selectedVehicle ?
@@ -156,8 +152,8 @@ export default function Vehicle() {
                                         id="vehiclePlate"
                                         label="Digite a placa"
                                         variant="outlined"
-                                        value={selectedVehicle ? selectedVehicle.vehiclePlate : ''}
-                                        onChange={(e) => setSelectedVehiselectedVehicle({ ...selectedVehicle, vehiclePlate: e.target.value })}
+                                        value={selectedVehicle ? plateMask(selectedVehicle.vehiclePlate) : ''}
+                                        onChange={(e) => setSelectedVehicle({ ...selectedVehicle, vehiclePlate: e.target.value })}
                                     />
                                 </Grid>
                                 <Grid item xs={12} display='flex' justifyContent='flex-end' gap={2}>

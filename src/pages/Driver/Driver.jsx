@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { addDriver, deleteDriver, editDriver } from "../../services/drivers";
 import { getVehicleById, getVehicles } from "../../services/vehicles";
 import { getDrivers } from "../../services/drivers";
+import { cpfMask } from "../../helper/cpfMask";
+import { onlyNumberMask } from "../../helper/onlyNumberMask";
+import { plateMask } from "../../helper/plateMask";
 
 export default function Driver() {
     const [driver, setDriver] = useState('');
@@ -12,25 +15,30 @@ export default function Driver() {
     const [selectedVehicle, setSelectedVehicle] = useState('');
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [selectedDriverVehicle, setSelectedDriverVehicle] = useState([]);
+    const [errorText, setErrorText] = useState('');
 
 
-    // add validations here (cpf, unique vehicle id etc)
-    // form create
+
     const handleSubmit = async () => {
         const model = {
             name: driver,
-            documentNumber: cpf,
+            documentNumber: onlyNumberMask(cpf),
             vehicleId: selectedVehicle
         }
         try {
-            const response = await addDriver(model);
-            console.log(response.data)
+            await addDriver(model);
         } catch (error) {
             console.log(error);
         }
     };
 
-    // form edit
+    const handleCpfChange = (e) => {
+        const newCpf = e.target.value;
+        const formattedCpf = cpfMask(newCpf);
+
+        setCpf(formattedCpf);
+    }
+
 
     const handleVehicleChange = (event) => {
         setSelectedVehicle(event.target.value);
@@ -51,7 +59,12 @@ export default function Driver() {
         } catch (error) {
             console.log(error)
         }
+    }
 
+    const handleCpfEditChange = (e) => {
+        const newCpf = e.target.value;
+        const formattedCpf = cpfMask(newCpf);
+        setSelectedDriver({ ...selectedDriver, documentNumber: formattedCpf })
     }
 
 
@@ -60,12 +73,11 @@ export default function Driver() {
         const model = {
             id: selectedDriver.id,
             name: selectedDriver.name,
-            documentNumber: selectedDriver.documentNumber,
+            documentNumber: onlyNumberMask(selectedDriver.documentNumber),
             vehicleId: selectedDriverVehicle,
         }
         try {
-            const response = await editDriver(model);
-            console.log(response.data, "data")
+            await editDriver(model);
         } catch (error) {
             console.log(error);
         }
@@ -73,8 +85,7 @@ export default function Driver() {
 
     const handleDelete = async () => {
         try {
-            const response = await deleteDriver(selectedDriver.id);
-            console.log(response.data, "DELETE DATA")
+            await deleteDriver(selectedDriver.id);
         } catch (error) {
             console.log(error);
         } finally {
@@ -122,9 +133,10 @@ export default function Driver() {
                                     size="small"
                                     id="documentNumber"
                                     label="Digite o CPF"
+                                    helperText={errorText && errorText}
                                     variant="outlined"
                                     value={cpf}
-                                    onChange={(e) => setCpf(e.target.value)}
+                                    onChange={handleCpfChange}
                                 />
                             </Grid>
                             <Grid item xs={12} md={4} style={{ flex: 1 }}>
@@ -145,7 +157,7 @@ export default function Driver() {
                                             <MenuItem value="">Selecione um veículo</MenuItem>
                                             {vehicles && vehicles.map((vehicle) => (
                                                 <MenuItem key={vehicle.id} value={vehicle.id}>
-                                                    {vehicle.vehicleBrand} - {vehicle.vehiclePlate}
+                                                    {vehicle.vehicleBrand} - {plateMask(vehicle.vehiclePlate)}
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -173,7 +185,8 @@ export default function Driver() {
                         options={driversList}
                         sx={{ minWidth: 200, marginBottom: 4 }}
                         onChange={onDriverListChange}
-                        getOptionLabel={(option) => option.name + ' - ' + option.documentNumber}
+                        noOptionsText={'Sem opções'}
+                        getOptionLabel={(option) => option.name + ' - ' + cpfMask(option.documentNumber)}
                         renderInput={(params) => <TextField {...params} label="Pesquise pelo motorista" />}
                     />
                     {selectedDriver ?
@@ -205,8 +218,8 @@ export default function Driver() {
                                         id="documentNumber"
                                         label="Digite o CPF"
                                         variant="outlined"
-                                        value={selectedDriver ? selectedDriver.documentNumber : ''}
-                                        onChange={(e) => setSelectedDriver({ ...selectedDriver, documentNumber: e.target.value })}
+                                        value={selectedDriver ? cpfMask(selectedDriver.documentNumber) : ''}
+                                        onChange={handleCpfEditChange}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4} style={{ flex: 1 }}>
