@@ -5,11 +5,6 @@ const port = 3000;
 
 const middlewares = jsonServer.defaults();
 server.use(middlewares);
-server.use(
-  jsonServer.rewriter({
-    "/*": "/$1"
-  })
-)
 
 server.use(router);
 server.listen(port, () => {
